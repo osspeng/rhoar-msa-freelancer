@@ -19,15 +19,44 @@ mvn clean fabric8:deploy -Popenshift
 ---
 Testing the service
 ---
-* Add projects by posting uri `/project` ,using  following payload
+* Add projects by posting uri `/projects` ,using  following payload
 ```
 {
-    "projectId": "111113",
+    "projectId": "111111",
     "firstName": "Jason",
     "lastName": "Peng",
-    "email": "hpeng@redhat.com",
+    "email": "jason@freelancer4j.com",
     "title": "Project Pheonix",
     "status": "OPEN"
 }
+
+{
+    "projectId": "111112",
+    "firstName": "Ethan",
+    "lastName": "Hunt",
+    "email": "ethan@freelancer4j.com",
+    "title": "Project Impossible",
+    "status": "OPEN"
+}
+
+{
+    "projectId": "111113",
+    "firstName": "Phil",
+    "lastName": "Lin",
+    "email": "lin@freelancer4j.com",
+    "title": "Project Angry Bird",
+    "status": "INPROGRESS"
+}
+
+{
+    "projectId": "111114",
+    "firstName": "Eddie",
+    "lastName": "Lee",
+    "email": "lee@freelancer4j.com",
+    "title": "Project Leak",
+    "status": "COMPLETED"
+}
 ```
 * Querying Projects by getting uri `/projects/`
+* Querying Projects by getting uri `/projects/status/OPEN`, `/projects/status/INPROGRESS`, `/projects/status/COMPLETED`
+
