@@ -50,7 +50,7 @@ public class ProjectServiceTest extends MongoTestBase {
     }
 
     @Test
-    public void testAddProduct(TestContext context) throws Exception {
+    public void testAddProject(TestContext context) throws Exception {
         String projectId = "999999";
         String firstName = "Jason";
         String lastName = "Peng";
@@ -87,7 +87,7 @@ public class ProjectServiceTest extends MongoTestBase {
     }
 
     @Test
-    public void testGetProducts(TestContext context) throws Exception {    	
+    public void testGetProjects(TestContext context) throws Exception {    	
     	Async saveAsync = context.async(2);
         String projectId1 = "111111";
         JsonObject json1 = new JsonObject()
@@ -142,7 +142,7 @@ public class ProjectServiceTest extends MongoTestBase {
     }
 
     @Test
-    public void testGetProduct(TestContext context) throws Exception {
+    public void testGetProject(TestContext context) throws Exception {
         Async saveAsync = context.async(2);
         String projectId1 = "111111";
         JsonObject json1 = new JsonObject()
@@ -195,7 +195,7 @@ public class ProjectServiceTest extends MongoTestBase {
     }
 
     @Test
-    public void testGetNonExistingProduct(TestContext context) throws Exception {
+    public void testGetNonExistingProject(TestContext context) throws Exception {
         Async saveAsync = context.async(1);
         String projectId1 = "111111";
         JsonObject json1 = new JsonObject()
@@ -237,6 +237,62 @@ public class ProjectServiceTest extends MongoTestBase {
         service.ping(ar -> {
             assertThat(ar.succeeded(), equalTo(true));
             async.complete();
+        });
+    }
+    
+    
+    @Test
+    public void testGetProjectsByStatus(TestContext context) throws Exception {    	
+    	Async saveAsync = context.async(2);
+        String projectId1 = "111111";
+        JsonObject json1 = new JsonObject()
+                .put("projectId", projectId1)
+                .put("firstName", "Jason")
+                .put("lastName", "Peng")
+                .put("email", "hpeng@redhat.com")
+                .put("title", "Project Pheonix")
+                .put("status", Project.Status.OPEN.toString());
+
+        mongoClient.save("projects", json1, ar -> {
+            if (ar.failed()) {
+                context.fail();
+            }
+            saveAsync.countDown();
+        });
+
+        String projectId2 = "222222";
+        JsonObject json2 = new JsonObject()
+                .put("projectId", projectId2)
+                .put("firstName", "Phil")
+                .put("lastName", "Andrew")
+                .put("email", "hpeng@redhat.com")
+                .put("title", "Project AngryBird")
+                .put("status", Project.Status.INPROGRESS.toString());
+
+        mongoClient.save("projects", json2, ar -> {
+            if (ar.failed()) {
+                context.fail();
+            }
+            saveAsync.countDown();
+        });
+
+        saveAsync.await();
+
+        ProjectService service = new ProjectServiceImpl(vertx, getConfig(), mongoClient);
+
+        Async async = context.async();
+
+        service.getProjectsByStatus(Project.Status.OPEN, ar -> {
+            if (ar.failed()) {
+                context.fail(ar.cause().getMessage());
+            } else {
+                assertThat(ar.result(), notNullValue());
+                assertThat(ar.result().size(), equalTo(1));
+                Set<String> itemIds = ar.result().stream().map(p -> p.getProjectId()).collect(Collectors.toSet());
+                assertThat(itemIds.size(), equalTo(1));
+                assertThat(itemIds,hasItem(projectId1));
+                async.complete();
+            }
         });
     }
 

@@ -164,7 +164,7 @@ public class ApiVerticleTest {
          }).when(projectService).getProject(eq("111111"),any());
 
         Async async = context.async();
-        vertx.createHttpClient().get(port, "localhost", "/project/111111", response -> {
+        vertx.createHttpClient().get(port, "localhost", "/projects/111111", response -> {
                 assertThat(response.statusCode(), equalTo(200));
                 assertThat(response.headers().get("Content-type"), equalTo("application/json"));
                 response.bodyHandler(body -> {
@@ -180,7 +180,7 @@ public class ApiVerticleTest {
             .exceptionHandler(context.exceptionHandler())
             .end();
     }
-
+    
     @Test
     public void testGetNonExistingProject(TestContext context) throws Exception {
         doAnswer(new Answer<Void>() {
@@ -192,7 +192,7 @@ public class ApiVerticleTest {
          }).when(projectService).getProject(eq("111111"),any());
 
         Async async = context.async();
-        vertx.createHttpClient().get(port, "localhost", "/project/111111", response -> {
+        vertx.createHttpClient().get(port, "localhost", "/projects/111111", response -> {
                 assertThat(response.statusCode(), equalTo(404));
                 async.complete();
             })
@@ -222,7 +222,7 @@ public class ApiVerticleTest {
                 .put("status", Project.Status.OPEN.toString());
         String body = json.encodePrettily();
         String length = Integer.toString(body.length());
-        vertx.createHttpClient().post(port, "localhost", "/project")
+        vertx.createHttpClient().post(port, "localhost", "/projects")
             .exceptionHandler(context.exceptionHandler())
             .putHeader("Content-type", "application/json")
             .putHeader("Content-length", length)
@@ -314,6 +314,94 @@ public class ApiVerticleTest {
             })
             .exceptionHandler(context.exceptionHandler())
             .end();
+    }
+    
+    
+    @Test
+    public void testGetProjectsByStatus(TestContext context) throws Exception {
+        String projectId1 = "111111";
+        JsonObject json1 = new JsonObject()
+                .put("projectId", projectId1)
+                .put("firstName", "Jason")
+                .put("lastName", "Peng")
+                .put("email", "hpeng@redhat.com")
+                .put("title", "Project Pheonix")
+                .put("description", "This is Project Pheonix")
+                .put("status", Project.Status.OPEN.toString());
+        String projectId2 = "222222";
+        JsonObject json2 = new JsonObject()
+                .put("projectId", projectId2)
+                .put("firstName", "Phil")
+                .put("lastName", "Andrew")
+                .put("email", "hpeng@redhat.com")
+                .put("title", "Project AngryBird")
+                .put("description", "This is Project AngryBird")
+                .put("status", Project.Status.INPROGRESS.toString());
+        List<Project> openPrj = new ArrayList<>();
+        openPrj.add(new Project(json1));
+//        projects.add(new Project(json2));
+        
+        doAnswer(new Answer<Void>() {
+            public Void answer(InvocationOnMock invocation){
+                Handler<AsyncResult<List<Project>>> handler = invocation.getArgument(1);
+                handler.handle(Future.succeededFuture(openPrj));
+                return null;
+             }
+         }).when(projectService).getProjectsByStatus(eq(Project.Status.OPEN),any());
+        
+        List<Project> inprogressPrj = new ArrayList<>();
+        inprogressPrj.add(new Project(json2));
+        doAnswer(new Answer<Void>() {
+            public Void answer(InvocationOnMock invocation){
+                Handler<AsyncResult<List<Project>>> handler = invocation.getArgument(1);
+                handler.handle(Future.succeededFuture(inprogressPrj));
+                return null;
+             }
+         }).when(projectService).getProjectsByStatus(eq(Project.Status.INPROGRESS),any());
+        
+
+        Async async = context.async();
+        vertx.createHttpClient().get(port, "localhost", "/projects/status/OPEN", response -> {
+                assertThat(response.statusCode(), equalTo(200));
+                assertThat(response.headers().get("Content-type"), equalTo("application/json"));
+                response.bodyHandler(body -> {
+                	JsonArray json = body.toJsonArray();
+                    Set<String> projectIds =  json.stream()
+                            .map(j -> new Project((JsonObject)j))
+                            .map(p -> p.getProjectId())
+                            .collect(Collectors.toSet());
+                    System.out.println("TEST RESULT 1: "+json.encodePrettily());
+                    assertThat(projectIds.size(), equalTo(1));
+                    assertThat(projectIds, hasItem(projectId1));
+                	
+                    verify(projectService).getProjectsByStatus(eq(Project.Status.OPEN), any());
+                    async.complete();
+                })
+                .exceptionHandler(context.exceptionHandler());
+            })
+            .exceptionHandler(context.exceptionHandler())
+            .end();
+        
+        vertx.createHttpClient().get(port, "localhost", "/projects/status/INPROGRESS", response -> {
+            assertThat(response.statusCode(), equalTo(200));
+            assertThat(response.headers().get("Content-type"), equalTo("application/json"));
+            response.bodyHandler(body -> {
+            	JsonArray json = body.toJsonArray();
+                Set<String> projectIds =  json.stream()
+                        .map(j -> new Project((JsonObject)j))
+                        .map(p -> p.getProjectId())
+                        .collect(Collectors.toSet());
+                System.out.println("TEST RESULT 2: "+json.encodePrettily());
+                assertThat(projectIds.size(), equalTo(1));
+                assertThat(projectIds, hasItem(projectId2));
+            	
+                verify(projectService).getProjectsByStatus(eq(Project.Status.INPROGRESS), any());
+                async.complete();
+            })
+            .exceptionHandler(context.exceptionHandler());
+        })
+        .exceptionHandler(context.exceptionHandler())
+        .end();
     }
 
 }

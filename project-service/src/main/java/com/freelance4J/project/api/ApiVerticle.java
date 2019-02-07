@@ -26,9 +26,10 @@ public class ApiVerticle extends AbstractVerticle {
 	public void start(Future<Void> startFuture) throws Exception {
 		Router router = Router.router(vertx);
 		router.get("/projects").handler(this::getProjects);
-		router.get("/project/:projectId").handler(this::getProject);
-		router.route("/project").handler(BodyHandler.create());
-		router.post("/project").handler(this::addProject);
+		router.get("/projects/:projectId").handler(this::getProject);
+		router.route("/projects").handler(BodyHandler.create());
+		router.post("/projects").handler(this::addProject);
+		router.get("/projects/status/:theStatus").handler(this::getProjectsByStatus);
 
 		// Health Checks
 		router.get("/health/readiness").handler(rc -> rc.response().end("OK"));
@@ -70,6 +71,21 @@ public class ApiVerticle extends AbstractVerticle {
 				} else {
 					rc.fail(404);
 				}
+			} else {
+				rc.fail(ar.cause());
+			}
+		});
+	}
+	private void getProjectsByStatus(RoutingContext rc) {
+		String theStatus = rc.request().getParam("theStatus");
+		projectService.getProjectsByStatus(Project.Status.valueOf(theStatus), ar -> {
+			if (ar.succeeded()) {
+				List<Project> projects = ar.result();
+				JsonArray json = new JsonArray();
+				projects.stream().map(p -> p.toJson()).forEach(p -> json.add(p));
+				rc.response()
+				  .putHeader("Content-type", "application/json")
+				  .end(json.encodePrettily());
 			} else {
 				rc.fail(ar.cause());
 			}
