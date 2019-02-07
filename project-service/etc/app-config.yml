@@ -1,0 +1,10 @@
+project.http.port: 8080
+connection_string: mongodb://project-mongodb:27017
+db_name: projectdb
+username: mongo
+password: mongo
+
+service-name: project-service
+reporter-log-spans: true
+sampler-type: ratelimiting
+sampler-param: 1
