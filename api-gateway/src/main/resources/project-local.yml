@@ -1,0 +1,9 @@
+swarm:
+  http:
+    port: 8181
+freelancer:
+  service:
+    url: http://freelancer-service-freelancer.apps.example.com
+project:
+  service:
+    url: http://project-service-project.apps.example.com
