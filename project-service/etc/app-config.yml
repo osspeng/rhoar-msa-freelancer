@@ -1,6 +1,6 @@
 project.http.port: 8080
 connection_string: mongodb://project-mongodb:27017
-db_name: projectdb
+db_name: project-mongodb
 username: mongo
 password: mongo
 

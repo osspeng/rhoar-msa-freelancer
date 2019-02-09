@@ -1,5 +1,19 @@
-Freelancer Service for Freelancer4J
-===
+# Freelancer Service for Freelancer4J
+
+
+---
+Compile, Package, and Run
+---
+
+```
+## with UT
+mvn clean package
+
+## without UT
+mvn clean package -DskipTests
+```
+**NOTICE:** Due to the fact that running the service will require a workable ProstgreSQL database, and the UT test all functions using embedded H2 DB, the service can not be run locally
+
 
 ---
 Deploying the project to OpenShift
@@ -7,6 +21,7 @@ Deploying the project to OpenShift
 **Login OpenShift using CLI and switch to working project, then execute following commands.**
 
 ```
+## make sure using same version of OC client as the OpenShift cluster
 oc new-app postgresql-ephemeral -p POSTGRESQL_USER=luke \
                                 -p POSTGRESQL_PASSWORD=secret \
                                 -p POSTGRESQL_DATABASE=my_data \

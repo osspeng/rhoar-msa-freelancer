@@ -10,7 +10,8 @@ Deploying the project to OpenShift
 ```
 oc create configmap gateway-service --from-file=etc/project-defaults.yml
 
-mvn clean fabric8:deploy -Popenshift
+## skip test for skipping integration test
+mvn clean fabric8:deploy -Popenshift -DskipTests=true
 ```
 
 ---
@@ -23,3 +24,17 @@ Testing the service
   * `/gateway/projects/`
   * `/gateway/projects/111111`
   * `/gateway/projects/status/OPEN`
+
+
+---
+APPENDIX for UT
+---
+* Running testing, please change uri in project-local.yml accordingly.
+```
+mvn clean verify
+```
+* Running application locally
+```
+mvn clean package
+java -jar target/api-gateway-1.0.0-SNAPSHOT-thorntail.jar -Slocal
+```

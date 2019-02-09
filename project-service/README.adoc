@@ -7,7 +7,7 @@ Deploying the project to OpenShift
 **Login OpenShift using CLI and switch to working project, then execute following commands.**
 
 ```
-oc new-app mongodb-ephemeral -p PROJECT_DB_USERNAME=mongo -p PROJECT_DB_PASSWORD=mongo -p MONGODB_DATABASE=project-mongodb -p DATABASE_SERVICE_NAME=project-mongodb
+oc new-app mongodb-ephemeral -p MONGODB_USER=mongo -p MONGODB_PASSWORD=mongo -p MONGODB_DATABASE=project-mongodb -p DATABASE_SERVICE_NAME=project-mongodb
 
 oc create configmap project-service --from-file=etc/app-config.yml
 
@@ -19,7 +19,8 @@ mvn clean fabric8:deploy -Popenshift
 ---
 Testing the service
 ---
-* Add projects by posting uri `/projects` ,using  following payload
+* Add projects by **POST**ing uri `/projects` ,using  following payload
+    * **NOTICE:** the post api has not support add array of projects, only single project payload is supported.
 ```
 {
     "projectId": "111111",
@@ -56,7 +57,16 @@ Testing the service
     "title": "Project Leak",
     "status": "COMPLETED"
 }
+
+{
+    "projectId": "111115",
+    "firstName": "Steve",
+    "lastName": "Pitt",
+    "email": "steve@freelancer4j.com",
+    "title": "Project Fire Me",
+    "status": "OPEN"
+}
 ```
-* Querying Projects by getting uri `/projects/`
-* Querying Projects by getting uri `/projects/status/OPEN`, `/projects/status/INPROGRESS`, `/projects/status/COMPLETED`
+* Querying Projects by **GET**ting uri `/projects/`
+* Querying Projects by **GET**ting uri `/projects/status/OPEN`, `/projects/status/INPROGRESS`, `/projects/status/COMPLETED`
 
