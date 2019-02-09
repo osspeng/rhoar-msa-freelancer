@@ -1,6 +1,9 @@
-freelancer:
-  service:
-    url: http://freelancer-service-freelancer.apps.example.com
-project:
-  service:
-    url: http://project-service-project.apps.example.com
+freelancer4J:
+  freelancer:
+    service:
+#      url: http://freelancer-service.freelancer.svc.cluster.local:8080
+      url: http://freelancer-service-freelancer.apps.example.com
+  project:
+    service:
+#      url: http://project-service.project.svc.cluster.local:8080
+      url: http://project-service-project.apps.example.com

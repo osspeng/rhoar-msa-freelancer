@@ -54,6 +54,16 @@ public class RestApiTest {
     @Test
     @RunAsClient
     public void testGetFreelancers() throws Exception {
+    	 WebTarget target = client.target("http://localhost:" + port).path("/gateway/freelancers");
+         Response response = target.request(MediaType.APPLICATION_JSON).get();
+         assertThat(response.getStatus(), equalTo(new Integer(200)));
+         JsonArray value = Json.parse(response.readEntity(String.class)).asArray();
+         assertThat(value.size(), equalTo(3));
+    }
+
+    @Test
+    @RunAsClient
+    public void testGetFreelancer() throws Exception {
         WebTarget target = client.target("http://localhost:" + port).path("/gateway/freelancers").path("/1");
         Response response = target.request(MediaType.APPLICATION_JSON).get();
         assertThat(response.getStatus(), equalTo(new Integer(200)));
@@ -62,11 +72,36 @@ public class RestApiTest {
         assertThat(value.getString("firstName", null), equalTo("Jason"));
         assertThat(value.getString("lastName", null), equalTo("Peng"));
     }
+    
 
     @Test
     @RunAsClient
-    public void testGetFreelancer() throws Exception {
-    	 WebTarget target = client.target("http://localhost:" + port).path("/gateway/freelancers");
+    public void testGetProjects() throws Exception {
+    	 WebTarget target = client.target("http://localhost:" + port).path("/gateway/projects");
+         Response response = target.request(MediaType.APPLICATION_JSON).get();
+         assertThat(response.getStatus(), equalTo(new Integer(200)));
+         JsonArray value = Json.parse(response.readEntity(String.class)).asArray();
+         assertThat(value.size(), equalTo(5));
+    }
+    
+
+    @Test
+    @RunAsClient
+    public void testGetProject() throws Exception {
+    	 WebTarget target = client.target("http://localhost:" + port).path("/gateway/projects/111111");
+         Response response = target.request(MediaType.APPLICATION_JSON).get();
+         assertThat(response.getStatus(), equalTo(new Integer(200)));
+         JsonObject value = Json.parse(response.readEntity(String.class)).asObject();
+         assertThat(value.getString("projectId", null), equalTo("111111"));
+         assertThat(value.getString("firstName", null), equalTo("Jason"));
+         assertThat(value.getString("lastName", null), equalTo("Peng"));
+    }
+    
+
+    @Test
+    @RunAsClient
+    public void testGetProjectsByStatus() throws Exception {
+    	 WebTarget target = client.target("http://localhost:" + port).path("/gateway/projects/status/OPEN");
          Response response = target.request(MediaType.APPLICATION_JSON).get();
          assertThat(response.getStatus(), equalTo(new Integer(200)));
          JsonArray value = Json.parse(response.readEntity(String.class)).asArray();

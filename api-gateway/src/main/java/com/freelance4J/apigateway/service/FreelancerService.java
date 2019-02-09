@@ -23,7 +23,7 @@ public class FreelancerService {
 	private WebTarget freelancerService;
 
 	@Inject
-	@ConfigurationValue("freelancer.service.url")
+	@ConfigurationValue("freelancer4J.freelancer.service.url")
 	private String freelancerUrl;
 
 	@PostConstruct

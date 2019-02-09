@@ -1,6 +1,5 @@
 package com.freelance4J.apigateway.service;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -23,7 +22,7 @@ public class ProjectService {
 	private WebTarget projectService;
 
 	@Inject
-	@ConfigurationValue("project.service.url")
+	@ConfigurationValue("freelancer4J.project.service.url")
 	private String projectUrl;
 
 	@PostConstruct
